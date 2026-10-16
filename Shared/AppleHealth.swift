@@ -270,6 +270,7 @@ final class AppleWorkoutRecorder: NSObject, HKWorkoutSessionDelegate, HKLiveWork
 
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
+    private var collecting = false
 
     func start(sport: SportKind) async throws {
         let configuration = HKWorkoutConfiguration()
@@ -296,10 +297,9 @@ final class AppleWorkoutRecorder: NSObject, HKWorkoutSessionDelegate, HKLiveWork
                     }
                 }
             }
+            collecting = true
         } catch {
-            session.end()
-            self.session = nil
-            self.builder = nil
+            discard()
             throw error
         }
     }
@@ -314,6 +314,19 @@ final class AppleWorkoutRecorder: NSObject, HKWorkoutSessionDelegate, HKLiveWork
 
     var isSessionOpen: Bool { session != nil }
 
+    /// Ends the session without `finishWorkout`, so Health does not keep a workout or route.
+    func discard() {
+        guard let session, let builder else { return }
+        let wasCollecting = collecting
+        collecting = false
+        self.session = nil
+        self.builder = nil
+        if wasCollecting {
+            builder.discardWorkout()
+        }
+        session.end()
+    }
+
     struct FinishOutcome {
         var healthID: String?
         var routeError: String?
@@ -321,6 +334,7 @@ final class AppleWorkoutRecorder: NSObject, HKWorkoutSessionDelegate, HKLiveWork
 
     func finish(route: [GeoPoint]) async -> FinishOutcome {
         guard let session, let builder else { return FinishOutcome(healthID: nil, routeError: nil) }
+        collecting = false
         session.end()
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             builder.endCollection(withEnd: Date()) { _, _ in

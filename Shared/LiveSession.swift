@@ -45,6 +45,10 @@ final class LiveSession: ObservableObject {
     private var healthDistance = 0.0
     private var lastLocation: CLLocation?
     private var lastAltitude: Double?
+    /// First fix after resume is the cached pre-pause coordinate. Do not anchor on it.
+    private var ignoreNextLocation = false
+    /// Samples stamped before this were taken during the pause.
+    private var resumeAnchorDate = Date.distantPast
     private var splitStartDistance = 0.0
     private var splitStartElapsed: TimeInterval = 0
     private var splitHearts: [Double] = []
@@ -105,7 +109,8 @@ final class LiveSession: ObservableObject {
                 guard phase == .running else { return }
                 try await recorder.start(sport: sport)
                 guard phase == .running else {
-                    _ = await recorder.finish(route: recordedRoute)
+                    // stop() already kept a record with no HealthKit id. Do not save this session.
+                    recorder.discard()
                     return
                 }
                 usedApple = true
@@ -115,10 +120,10 @@ final class LiveSession: ObservableObject {
                 startLocation()
             } catch {
                 guard phase == .running else { return }
-                await beginSimulation("健康数据没有启动，已改用本地模拟")
+                beginSimulation("健康数据没有启动，已改用本地模拟")
             }
         } else {
-            await beginSimulation("这台设备没有健康数据，已改用本地模拟")
+            beginSimulation("这台设备没有健康数据，已改用本地模拟")
         }
         guard phase == .running else { return }
         Task { @MainActor [weak self] in
@@ -156,6 +161,8 @@ final class LiveSession: ObservableObject {
         if usedApple { recorder.resume() }
         guard !simulating else { return }
         startPedometer()
+        ignoreNextLocation = true
+        resumeAnchorDate = Date()
         location.startUpdatingLocation()
     }
 
@@ -188,25 +195,18 @@ final class LiveSession: ObservableObject {
         return makeRecord(healthID: healthID)
     }
 
-    /// Ends a live HealthKit session, drops its track, then records only simulated points.
-    private func beginSimulation(_ reason: String) async {
+    /// Drops the Apple session without saving it, then records only simulated points.
+    private func beginSimulation(_ reason: String) {
         guard phase == .running, !simulating, !leavingApple else { return }
         leavingApple = true
         usedApple = false
         location.stopUpdatingLocation()
         pedometer.stopUpdates()
-        var routeNote = ""
         if recorder.isSessionOpen {
-            let outcome = await recorder.finish(route: recordedRoute)
-            if let routeError = outcome.routeError {
-                routeNote = "路线没有写入健康：\(routeError)"
-            }
+            recorder.discard()
         }
         guard phase == .running else { return }
-        statusText = routeNote.isEmpty ? reason : "\(reason)。\(routeNote)"
-        if !routeNote.isEmpty {
-            routeSaveWarning = routeNote
-        }
+        statusText = reason
         resetTrack()
         simulating = true
         leavingApple = false
@@ -237,7 +237,7 @@ final class LiveSession: ObservableObject {
         recorder.onFailure = { [weak self] message in
             Task { @MainActor in
                 guard let self, self.phase == .running, !self.simulating, !self.leavingApple else { return }
-                await self.beginSimulation("锻炼中断（\(message)），已改用本地模拟")
+                self.beginSimulation("锻炼中断（\(message)），已改用本地模拟")
             }
         }
         locationProxy.onLocation = { [weak self] location in
@@ -348,6 +348,10 @@ final class LiveSession: ObservableObject {
 
     private func apply(_ location: CLLocation) {
         guard phase == .running, !paused, !simulating, !leavingApple else { return }
+        if ignoreNextLocation || location.timestamp < resumeAnchorDate {
+            ignoreNextLocation = false
+            return
+        }
         guard location.horizontalAccuracy >= 0, location.horizontalAccuracy < 40 else { return }
         if let lastLocation {
             let delta = location.distance(from: lastLocation)
@@ -405,6 +409,8 @@ final class LiveSession: ObservableObject {
         elevationGainMeters = 0
         lastLocation = nil
         lastAltitude = nil
+        ignoreNextLocation = false
+        resumeAnchorDate = .distantPast
         splits = []
         splitStartDistance = 0
         splitStartElapsed = 0
