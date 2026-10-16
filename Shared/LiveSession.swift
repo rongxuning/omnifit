@@ -26,9 +26,11 @@ final class LiveSession: ObservableObject {
     @Published var cadence: Double = 0
     @Published var energyKilocalories: Double = 0
     @Published var elevationGainMeters: Double = 0
+    /// Downsampled for the map. The saved record and the HealthKit route use `recordedRoute`.
     @Published var route: [GeoPoint] = []
     @Published var splits: [KilometerSplit] = []
     @Published var teammates: [TeammateLive] = []
+    private(set) var routeSaveWarning: String?
 
     private let recorder = AppleWorkoutRecorder()
     private let sync: TeammateSync = LocalTeammateSimulator()
@@ -62,7 +64,10 @@ final class LiveSession: ObservableObject {
     private var simPoint = SampleLibrary.plannedRoutes(around: MapOrigin.fallback)[0].points.first ?? MapOrigin.fallback
     private var sampleTick = 0
     private var usedApple = false
+    private var leavingApple = false
     private var teammatesStarted = false
+    /// Every accepted point. Display uses a downsample of this.
+    private var recordedRoute: [GeoPoint] = []
 
     init(sport: SportKind, plannedRoute: [GeoPoint], teammates: [TeammateProfile]) {
         self.sport = sport
@@ -91,21 +96,31 @@ final class LiveSession: ObservableObject {
         runningSince = Date()
         wireCallbacks()
         startTimer()
-        startPedometer()
-        startLocation()
+        // Location stays off until HealthKit either starts or we choose simulation.
+        // Points collected before that choice were being kept, then simulation jumped
+        // to the fallback origin and appended a fake track onto them.
         if AppleHealth.available {
             do {
                 try await AppleHealth.authorize()
+                guard phase == .running else { return }
                 try await recorder.start(sport: sport)
+                guard phase == .running else {
+                    _ = await recorder.finish(route: recordedRoute)
+                    return
+                }
                 usedApple = true
                 simulating = false
                 statusText = ""
+                startPedometer()
+                startLocation()
             } catch {
-                beginSimulation("健康数据没有启动，已改用本地模拟")
+                guard phase == .running else { return }
+                await beginSimulation("健康数据没有启动，已改用本地模拟")
             }
         } else {
-            beginSimulation("这台设备没有健康数据，已改用本地模拟")
+            await beginSimulation("这台设备没有健康数据，已改用本地模拟")
         }
+        guard phase == .running else { return }
         Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             guard let self, self.phase == .running, !self.teammatesStarted else { return }
@@ -127,6 +142,9 @@ final class LiveSession: ObservableObject {
         banked = elapsed
         runningSince = nil
         paused = true
+        location.stopUpdatingLocation()
+        lastLocation = nil
+        lastAltitude = nil
         if usedApple { recorder.pause() }
         pedometer.stopUpdates()
     }
@@ -136,7 +154,9 @@ final class LiveSession: ObservableObject {
         runningSince = Date()
         paused = false
         if usedApple { recorder.resume() }
+        guard !simulating else { return }
         startPedometer()
+        location.startUpdatingLocation()
     }
 
     func stop() async -> WorkoutRecord {
@@ -153,15 +173,43 @@ final class LiveSession: ObservableObject {
         if leftover > 30 {
             closeSplit(distance: leftover, partial: true)
         }
-        let healthID = usedApple ? await recorder.finish(route: route) : nil
+        leavingApple = true
+        var healthID: String?
+        if usedApple {
+            let outcome = await recorder.finish(route: recordedRoute)
+            healthID = outcome.healthID
+            if let routeError = outcome.routeError {
+                routeSaveWarning = "路线没有写入健康：\(routeError)"
+                statusText = routeSaveWarning ?? ""
+            }
+        }
+        usedApple = false
         sync.stop()
         return makeRecord(healthID: healthID)
     }
 
-    private func beginSimulation(_ reason: String) {
-        simulating = true
+    /// Ends a live HealthKit session, drops its track, then records only simulated points.
+    private func beginSimulation(_ reason: String) async {
+        guard phase == .running, !simulating, !leavingApple else { return }
+        leavingApple = true
         usedApple = false
-        statusText = reason
+        location.stopUpdatingLocation()
+        pedometer.stopUpdates()
+        var routeNote = ""
+        if recorder.isSessionOpen {
+            let outcome = await recorder.finish(route: recordedRoute)
+            if let routeError = outcome.routeError {
+                routeNote = "路线没有写入健康：\(routeError)"
+            }
+        }
+        guard phase == .running else { return }
+        statusText = routeNote.isEmpty ? reason : "\(reason)。\(routeNote)"
+        if !routeNote.isEmpty {
+            routeSaveWarning = routeNote
+        }
+        resetTrack()
+        simulating = true
+        leavingApple = false
         simPoint = MapOrigin.fallback
         startTeammates(at: MapOrigin.fallback)
     }
@@ -188,8 +236,8 @@ final class LiveSession: ObservableObject {
         }
         recorder.onFailure = { [weak self] message in
             Task { @MainActor in
-                guard let self, self.phase == .running, !self.simulating else { return }
-                self.beginSimulation("锻炼中断（\(message)），已改用本地模拟")
+                guard let self, self.phase == .running, !self.simulating, !self.leavingApple else { return }
+                await self.beginSimulation("锻炼中断（\(message)），已改用本地模拟")
             }
         }
         locationProxy.onLocation = { [weak self] location in
@@ -217,7 +265,7 @@ final class LiveSession: ObservableObject {
             let cadence = (data.currentCadence?.doubleValue ?? 0) * 60
             let steps = data.numberOfSteps.doubleValue
             Task { @MainActor in
-                guard let self, !self.simulating, !self.paused else { return }
+                guard let self, !self.simulating, !self.paused, !self.leavingApple else { return }
                 if cadence > 0 {
                     self.cadence = cadence
                     self.splitCadences.append(cadence)
@@ -236,7 +284,7 @@ final class LiveSession: ObservableObject {
     }
 
     private func tick() {
-        guard phase == .running, !paused else { return }
+        guard phase == .running, !paused, !leavingApple else { return }
         if let runningSince {
             elapsed = banked + Date().timeIntervalSince(runningSince)
         }
@@ -269,7 +317,7 @@ final class LiveSession: ObservableObject {
         simPoint.altitude = 18 + 6 * sin(elapsed / 40)
         simPoint.timestamp = Date()
         gpsDistance += speed
-        route.append(simPoint)
+        appendPoint(simPoint)
         paceSecPerKm = 1000 / speed
         heartRate = (sport == .running ? 156 : 118) + sin(elapsed / 12) * 6
         cadence = sport == .running ? 174 + sin(elapsed / 9) * 4 : 110 + sin(elapsed / 10) * 3
@@ -278,13 +326,10 @@ final class LiveSession: ObservableObject {
         noteAltitude(simPoint.altitude)
         splitHearts.append(heartRate)
         splitCadences.append(cadence)
-        if route.count > 1800 {
-            route.removeFirst(route.count - 1500)
-        }
     }
 
     private func apply(_ reading: AppleWorkoutRecorder.Reading) {
-        guard !simulating else { return }
+        guard phase == .running, !paused, !simulating, !leavingApple else { return }
         if let heart = reading.heartRate, heart > 0 {
             heartRate = heart
             splitHearts.append(heart)
@@ -302,7 +347,8 @@ final class LiveSession: ObservableObject {
     }
 
     private func apply(_ location: CLLocation) {
-        guard !simulating, location.horizontalAccuracy >= 0, location.horizontalAccuracy < 40 else { return }
+        guard phase == .running, !paused, !simulating, !leavingApple else { return }
+        guard location.horizontalAccuracy >= 0, location.horizontalAccuracy < 40 else { return }
         if let lastLocation {
             let delta = location.distance(from: lastLocation)
             if delta > 0.8, delta < 40 {
@@ -325,12 +371,61 @@ final class LiveSession: ObservableObject {
             altitude: location.altitude,
             timestamp: location.timestamp
         )
-        route.append(point)
+        appendPoint(point)
         noteAltitude(location.altitude)
         refreshDistance()
-        if route.count > 600 {
-            route = Array(route.suffix(600))
+    }
+
+    private func appendPoint(_ point: GeoPoint) {
+        recordedRoute.append(point)
+        route = Self.displayRoute(recordedRoute)
+    }
+
+    /// Map display only. `recordedRoute` stays complete for the saved workout and HealthKit.
+    private static func displayRoute(_ points: [GeoPoint]) -> [GeoPoint] {
+        let limit = 600
+        guard points.count > limit else { return points }
+        let lastIndex = points.count - 1
+        return (0..<limit).map { slot in
+            let index = Int((Double(slot) * Double(lastIndex) / Double(limit - 1)).rounded())
+            return points[index]
         }
+    }
+
+    private func resetTrack() {
+        recordedRoute = []
+        route = []
+        gpsDistance = 0
+        healthDistance = 0
+        distanceMeters = 0
+        paceSecPerKm = 0
+        heartRate = 0
+        cadence = 0
+        energyKilocalories = 0
+        elevationGainMeters = 0
+        lastLocation = nil
+        lastAltitude = nil
+        splits = []
+        splitStartDistance = 0
+        splitStartElapsed = 0
+        splitHearts = []
+        splitCadences = []
+        heartSeries = []
+        cadenceSeries = []
+        paceSeries = []
+        strideSeries = []
+        elevationSeries = []
+        contactSeries = []
+        powerSeries = []
+        stepCount = 0
+        latestPower = 0
+        latestStride = 0
+        latestContact = 0
+        sampleTick = 0
+        startedAt = Date()
+        runningSince = Date()
+        banked = 0
+        elapsed = 0
     }
 
     private func refreshDistance() {
@@ -412,7 +507,7 @@ final class LiveSession: ObservableObject {
             averageHeartRate: mean(hearts),
             averageCadence: mean(cadences),
             elevationGainMeters: elevationGainMeters,
-            route: route,
+            route: recordedRoute,
             splits: splits,
             heartRate: heartSeries,
             cadenceSeries: cadenceSeries,

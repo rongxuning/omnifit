@@ -16,6 +16,8 @@ struct StartMapView: View {
     @State private var sheet: StartSheet?
     @State private var counting = false
     @State private var count = 3
+    @State private var launching = false
+    @State private var countdownTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -29,6 +31,7 @@ struct StartMapView: View {
             VStack {
                 HStack {
                     Button {
+                        cancelCountdown()
                         path = NavigationPath()
                     } label: {
                         Image(systemName: "chevron.left")
@@ -56,7 +59,13 @@ struct StartMapView: View {
             }
         }
         .navigationBarHidden(true)
-        .onAppear { location.request() }
+        .onAppear {
+            location.request()
+            if countdownTask == nil {
+                launching = false
+            }
+        }
+        .onDisappear { cancelCountdown() }
         .onChange(of: location.coordinate?.latitude) { _, _ in
             if let coordinate = location.coordinate {
                 draft.origin = GeoPoint(
@@ -81,7 +90,10 @@ struct StartMapView: View {
             barButton("square.grid.2x2", "类型") { sheet = .type }
             barButton("point.topleft.down.curvedto.point.bottomright.up", "路线") { sheet = .route }
             barButton("play.fill", "开始", active: true, action: start)
-            barButton("person.2", "组队", badge: draft.memberIDs.count) { path.append(TrainRoute.team) }
+            barButton("person.2", "组队", badge: draft.memberIDs.count) {
+                cancelCountdown()
+                path.append(TrainRoute.team)
+            }
             barButton("gearshape.fill", "设置") { sheet = .settings }
         }
         .padding(.horizontal, 4)
@@ -114,24 +126,42 @@ struct StartMapView: View {
     }
 
     private func start() {
+        guard !launching else { return }
         if app.activeSession?.phase == .running {
+            launching = true
             path.append(TrainRoute.live)
             return
         }
         guard draft.countdown else {
+            launching = true
             path.append(TrainRoute.live)
             return
         }
+        launching = true
         counting = true
         count = 3
-        Task {
+        countdownTask = Task { @MainActor in
             for value in stride(from: 3, through: 1, by: -1) {
+                if Task.isCancelled { return }
                 count = value
-                try? await Task.sleep(nanoseconds: 700_000_000)
+                do {
+                    try await Task.sleep(nanoseconds: 700_000_000)
+                } catch {
+                    return
+                }
             }
+            guard !Task.isCancelled else { return }
             counting = false
+            countdownTask = nil
             path.append(TrainRoute.live)
         }
+    }
+
+    private func cancelCountdown() {
+        countdownTask?.cancel()
+        countdownTask = nil
+        counting = false
+        launching = false
     }
 }
 

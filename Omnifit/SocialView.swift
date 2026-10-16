@@ -147,6 +147,7 @@ struct RouteArt: View {
 
 struct ShareComposer: View {
     var record: WorkoutRecord
+    var notice: String? = nil
     var onShare: (String, Data?) -> Void
     var onSkip: () -> Void
 
@@ -163,6 +164,11 @@ struct ShareComposer: View {
                     Text("\(record.sport.title) · \(Format.kilometers(record.distanceMeters)) 公里 · \(Format.pace(record.averagePaceSecPerKm)) · \(Format.duration(record.duration))")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.omniMuted)
+                    if let notice {
+                        Text(notice)
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color.omniInk)
+                    }
                     TextField("写点什么", text: $text, axis: .vertical)
                         .lineLimit(3...6)
                         .font(.system(size: 16, design: .rounded))

@@ -83,8 +83,15 @@ enum AppleHealth {
     }
 
     private static func record(from workout: HKWorkout, sport: SportKind, route: [GeoPoint]) -> WorkoutRecord {
-        let distance = sum(workout, identifier: .distanceWalkingRunning, unit: .meter()) ?? 0
-        let energy = sum(workout, identifier: .activeEnergyBurned, unit: .kilocalorie()) ?? 0
+        // Prefer statistics. Some imported workouts leave statistics(for:) nil and only
+        // fill the older totals, which would otherwise be stored as 0.
+        // Heart rate has no workout-level total, so it stays on statistics.
+        let distance = sum(workout, identifier: .distanceWalkingRunning, unit: .meter())
+            ?? workout.totalDistance?.doubleValue(for: .meter())
+            ?? 0
+        let energy = sum(workout, identifier: .activeEnergyBurned, unit: .kilocalorie())
+            ?? workout.totalEnergyBurned?.doubleValue(for: .kilocalorie())
+            ?? 0
         let heart = average(workout, identifier: .heartRate, unit: HKUnit.count().unitDivided(by: .minute())) ?? 0
         var climb = 0.0
         if let quantity = workout.metadata?[HKMetadataKeyElevationAscended] as? HKQuantity {
@@ -203,7 +210,8 @@ enum AppleHealth {
     }
 
     private static var shareTypes: Set<HKSampleType> {
-        var types: Set<HKSampleType> = [HKObjectType.workoutType()]
+        // save(route:) writes an HKWorkoutRoute, so share permission has to include the series type.
+        var types: Set<HKSampleType> = [HKObjectType.workoutType(), HKSeriesType.workoutRoute()]
         for identifier in [HKQuantityTypeIdentifier.heartRate, .activeEnergyBurned, .distanceWalkingRunning] {
             if let type = HKQuantityType.quantityType(forIdentifier: identifier) {
                 types.insert(type)
@@ -304,8 +312,15 @@ final class AppleWorkoutRecorder: NSObject, HKWorkoutSessionDelegate, HKLiveWork
         session?.resume()
     }
 
-    func finish(route: [GeoPoint]) async -> String? {
-        guard let session, let builder else { return nil }
+    var isSessionOpen: Bool { session != nil }
+
+    struct FinishOutcome {
+        var healthID: String?
+        var routeError: String?
+    }
+
+    func finish(route: [GeoPoint]) async -> FinishOutcome {
+        guard let session, let builder else { return FinishOutcome(healthID: nil, routeError: nil) }
         session.end()
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             builder.endCollection(withEnd: Date()) { _, _ in
@@ -319,10 +334,15 @@ final class AppleWorkoutRecorder: NSObject, HKWorkoutSessionDelegate, HKLiveWork
         }
         self.session = nil
         self.builder = nil
+        var routeError: String?
         if let workout, route.count >= 2 {
-            await save(route: route, workout: workout)
+            do {
+                try await save(route: route, workout: workout)
+            } catch {
+                routeError = error.localizedDescription
+            }
         }
-        return workout?.uuid.uuidString
+        return FinishOutcome(healthID: workout?.uuid.uuidString, routeError: routeError)
     }
 
     func workoutSession(_ workoutSession: HKWorkoutSession, didChangeTo toState: HKWorkoutSessionState, from fromState: HKWorkoutSessionState, date: Date) {}
@@ -358,7 +378,7 @@ final class AppleWorkoutRecorder: NSObject, HKWorkoutSessionDelegate, HKLiveWork
         return builder.statistics(for: type)?.sumQuantity()?.doubleValue(for: unit)
     }
 
-    private func save(route: [GeoPoint], workout: HKWorkout) async {
+    private func save(route: [GeoPoint], workout: HKWorkout) async throws {
         let locations = route.map { point in
             CLLocation(
                 coordinate: point.coordinate,
@@ -369,10 +389,24 @@ final class AppleWorkoutRecorder: NSObject, HKWorkoutSessionDelegate, HKLiveWork
             )
         }
         let builder = HKWorkoutRouteBuilder(healthStore: AppleHealth.store, device: nil)
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            builder.insertRouteData(locations) { _, _ in
-                builder.finishRoute(with: workout, metadata: nil) { _, _ in
-                    continuation.resume()
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            builder.insertRouteData(locations) { success, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                guard success else {
+                    continuation.resume(throwing: RecorderError.failed)
+                    return
+                }
+                builder.finishRoute(with: workout, metadata: nil) { saved, error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                    } else if saved == nil {
+                        continuation.resume(throwing: RecorderError.failed)
+                    } else {
+                        continuation.resume()
+                    }
                 }
             }
         }

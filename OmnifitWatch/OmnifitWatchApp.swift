@@ -113,6 +113,7 @@ struct WatchLiveView: View {
     var sport: SportKind
     @StateObject private var session: LiveSession
     @State private var started = false
+    @State private var routeWarning: String?
 
     init(sport: SportKind, teammates: [TeammateProfile]) {
         self.sport = sport
@@ -198,12 +199,24 @@ struct WatchLiveView: View {
             started = true
             await session.start()
         }
+        .alert("路线没有写入健康", isPresented: Binding(
+            get: { routeWarning != nil },
+            set: { if !$0 { routeWarning = nil } }
+        )) {
+            Button("好") { dismiss() }
+        } message: {
+            Text(routeWarning ?? "")
+        }
     }
 
     private func end() async {
         let record = await session.stop()
         app.add(record)
-        dismiss()
+        if let warning = session.routeSaveWarning {
+            routeWarning = warning
+        } else {
+            dismiss()
+        }
     }
 }
 

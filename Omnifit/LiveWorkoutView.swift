@@ -6,6 +6,7 @@ struct LiveWorkoutView: View {
     @State private var session: LiveSession?
     @State private var confirmEnd = false
     @State private var shareRecord: WorkoutRecord?
+    @State private var routeNotice: String?
     @State private var started = false
 
     var body: some View {
@@ -30,7 +31,7 @@ struct LiveWorkoutView: View {
             }
         }
         .sheet(item: $shareRecord) { record in
-            ShareComposer(record: record) { text, image in
+            ShareComposer(record: record, notice: routeNotice) { text, image in
                 app.addWorkout(record)
                 app.addPost(from: record, text: text, imageData: image)
                 shareRecord = nil
@@ -47,6 +48,7 @@ struct LiveWorkoutView: View {
     private func finish() async {
         guard let session else { return }
         let record = await session.stop()
+        routeNotice = session.routeSaveWarning
         shareRecord = record
     }
 }
