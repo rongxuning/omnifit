@@ -115,64 +115,45 @@ private struct RecordCard: View {
     var workout: WorkoutRecord
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(workout.sport.title)
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                    Text(Format.dayTime(workout.start))
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color.omniMuted)
-                    Text(Format.duration(workout.duration))
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color.omniMuted)
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(Format.kilometers(workout.distanceMeters))
-                        .font(.system(size: 28, weight: .heavy, design: .rounded))
-                        .foregroundStyle(Color.omniIce)
-                    Text("公里")
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color.omniMuted)
-                }
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(workout.sport.title)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                Spacer(minLength: 8)
+                Text(Format.kilometers(workout.distanceMeters))
+                    .font(.system(size: 22, weight: .heavy, design: .rounded))
+                    .foregroundStyle(Color.omniIce)
+                Text("公里")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color.omniMuted)
             }
-            Divider().overlay(Color.omniIce.opacity(0.35))
-            HStack {
-                mini("能量消耗", "\(Int(workout.energyKilocalories.rounded()))", "千卡", symbol: "flame.fill", coral: true)
-                mini("平均心率", Format.integer(workout.averageHeartRate), "次/分", symbol: "heart.fill", coral: true)
-                mini("负荷", "\(workout.sessionLoad)", "", symbol: nil, coral: false)
+            Text("\(Format.dayTime(workout.start)) · \(Format.duration(workout.duration))")
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.omniMuted)
+                .lineLimit(1)
+            HStack(spacing: 6) {
+                stat(Format.pace(workout.averagePaceSecPerKm), "配速", coral: false)
+                stat("\(Int(workout.energyKilocalories.rounded()))", "千卡", coral: true)
+                stat(Format.integer(workout.averageHeartRate), "心率", coral: true)
+                stat("\(workout.sessionLoad)", "负荷", coral: false)
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
         .glass()
     }
 
-    private func mini(_ title: String, _ value: String, _ unit: String, symbol: String?, coral: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 3) {
-                if let symbol {
-                    Image(systemName: symbol)
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.omniCoral)
-                }
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color.omniMuted)
-                    .lineLimit(1)
-            }
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(.system(size: 16, weight: .heavy, design: .rounded))
-                    .foregroundStyle(coral ? Color.omniCoral : Color.omniIce)
-                if !unit.isEmpty {
-                    Text(unit)
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color.omniMuted)
-                }
-            }
+    private func stat(_ value: String, _ title: String, coral: Bool) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 2) {
+            Text(value)
+                .font(.system(size: 13, weight: .heavy, design: .rounded))
+                .foregroundStyle(coral ? Color.omniCoral : Color.omniIce)
+            Text(title)
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.omniMuted)
         }
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
