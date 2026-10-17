@@ -30,8 +30,13 @@ enum MeRoute: Hashable {
     case layout
 }
 
+enum MapRoute: Hashable {
+    case editor
+}
+
 enum RootTab: String, CaseIterable, Identifiable {
     case train
+    case map
     case records
     case social
     case me
@@ -41,6 +46,7 @@ enum RootTab: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .train: return "训练"
+        case .map: return "地图"
         case .records: return "记录"
         case .social: return "社交"
         case .me: return "我"
@@ -50,6 +56,7 @@ enum RootTab: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .train: return "figure.run"
+        case .map: return "map"
         case .records: return "list.bullet"
         case .social: return "person.2"
         case .me: return "person"
@@ -76,12 +83,14 @@ struct MainShell: View {
     @EnvironmentObject private var app: PhoneAppState
     @State private var tab: RootTab = .train
     @State private var trainPath = NavigationPath()
+    @State private var mapPath = NavigationPath()
     @State private var recordPath = NavigationPath()
     @State private var mePath = NavigationPath()
 
     private var showsTabBar: Bool {
         switch tab {
         case .train: return trainPath.isEmpty
+        case .map: return mapPath.isEmpty
         case .records: return recordPath.isEmpty
         case .social: return true
         case .me: return mePath.isEmpty
@@ -97,11 +106,18 @@ struct MainShell: View {
                         TrainHome()
                             .navigationDestination(for: TrainRoute.self) { route in
                                 switch route {
-                                case .start: StartMapView(path: $trainPath)
+                                case .start: StartMapView(path: $trainPath, tab: $tab)
                                 case .team: TeamPickerView()
                                 case .live: LiveWorkoutView()
                                 case .layout: LayoutEditor()
                                 }
+                            }
+                    }
+                case .map:
+                    NavigationStack(path: $mapPath) {
+                        MapLibraryView()
+                            .navigationDestination(for: MapRoute.self) { _ in
+                                PresetRouteEditor()
                             }
                     }
                 case .records:
@@ -152,9 +168,11 @@ struct FloatingTabBar: View {
                 } label: {
                     VStack(spacing: 3) {
                         Image(systemName: item.symbol)
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 16, weight: .semibold))
                         Text(item.title)
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                     .foregroundStyle(tab == item ? Color.omniCobalt : Color.omniIdle)
                     .frame(maxWidth: .infinity)

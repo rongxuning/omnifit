@@ -7,6 +7,15 @@ enum SampleLibrary {
         TeammateProfile(id: "zhouzhou", name: "周舟")
     ]
 
+    static func presetRunningRoute() -> SavedRoute {
+        SavedRoute(
+            id: SavedRoute.presetRunningID,
+            name: "湖滨环线",
+            points: loop(MapOrigin.fallback, radii: [0, 180, 420, 460, 220], closed: true),
+            kind: .presetRunning
+        )
+    }
+
     static func plannedRoutes(around origin: GeoPoint) -> [PlannedRoute] {
         [
             .free,

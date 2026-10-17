@@ -3,7 +3,6 @@ import SwiftUI
 
 enum StartSheet: String, Identifiable {
     case type
-    case route
     case settings
     var id: String { rawValue }
 }
@@ -12,6 +11,7 @@ struct StartMapView: View {
     @EnvironmentObject private var app: PhoneAppState
     @EnvironmentObject private var draft: WorkoutDraft
     @Binding var path: NavigationPath
+    @Binding var tab: RootTab
     @StateObject private var location = LocationPermission()
     @State private var sheet: StartSheet?
     @State private var counting = false
@@ -23,7 +23,7 @@ struct StartMapView: View {
         ZStack {
             RouteMap(
                 route: [],
-                planned: draft.planned.points,
+                planned: draft.plannedRoute(saved: app.savedRoutes, workouts: app.workouts).points,
                 showsUser: true
             )
             .ignoresSafeArea()
@@ -79,7 +79,6 @@ struct StartMapView: View {
         .sheet(item: $sheet) { item in
             switch item {
             case .type: TypeSheet().presentationDetents([.height(280)])
-            case .route: RouteSheet().presentationDetents([.medium])
             case .settings: StartSettingsSheet(path: $path, sheet: $sheet).presentationDetents([.medium])
             }
         }
@@ -88,7 +87,10 @@ struct StartMapView: View {
     private var startBar: some View {
         HStack(spacing: 0) {
             barButton("square.grid.2x2", "类型") { sheet = .type }
-            barButton("point.topleft.down.curvedto.point.bottomright.up", "路线") { sheet = .route }
+            barButton("point.topleft.down.curvedto.point.bottomright.up", "路线") {
+                cancelCountdown()
+                tab = .map
+            }
             barButton("play.fill", "开始", active: true, action: start)
             barButton("person.2", "组队", badge: draft.memberIDs.count) {
                 cancelCountdown()
@@ -201,46 +203,8 @@ struct TypeSheet: View {
     }
 }
 
-struct RouteSheet: View {
-    @EnvironmentObject private var draft: WorkoutDraft
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("路线")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .padding(.top, 8)
-            ForEach(SampleLibrary.plannedRoutes(around: draft.origin)) { route in
-                Button {
-                    draft.routeID = route.id
-                    dismiss()
-                } label: {
-                    HStack {
-                        Text(route.name)
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        Spacer()
-                        if draft.routeID == route.id {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(Color.omniCobalt)
-                        }
-                    }
-                    .foregroundStyle(Color.omniInk)
-                    .padding(16)
-                    .glass()
-                }
-                .buttonStyle(.plain)
-            }
-            Text("路线画在地图上，仅保存在这台手机。")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(Color.omniMuted)
-            Spacer()
-        }
-        .padding(20)
-        .background(Color.omniCanvas)
-    }
-}
-
 struct StartSettingsSheet: View {
+    @EnvironmentObject private var app: PhoneAppState
     @EnvironmentObject private var draft: WorkoutDraft
     @Binding var path: NavigationPath
     @Binding var sheet: StartSheet?
@@ -249,7 +213,7 @@ struct StartSettingsSheet: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("设置")
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-            Text("\(draft.sport.title) · \(draft.planned.name)")
+            Text("\(draft.sport.title) · \(draft.plannedRoute(saved: app.savedRoutes, workouts: app.workouts).name)")
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .foregroundStyle(Color.omniMuted)
             Toggle(isOn: $draft.countdown) {

@@ -30,15 +30,23 @@ final class PhoneAppState: ObservableObject {
             if loaded.metricOrder.isEmpty {
                 loaded.metricOrder = LiveBlock.standard
             }
+            ensurePreset(&loaded)
             database = loaded
+            AppFiles.save(loaded, name: filename)
         } else {
             var fresh = Database()
             fresh.workouts = SampleLibrary.workouts()
             fresh.posts = SampleLibrary.posts()
             fresh.seeded = true
+            ensurePreset(&fresh)
             database = fresh
             AppFiles.save(fresh, name: filename)
         }
+    }
+
+    private func ensurePreset(_ database: inout Database) {
+        guard !database.routes.contains(where: { $0.kind == .presetRunning }) else { return }
+        database.routes.insert(SampleLibrary.presetRunningRoute(), at: 0)
     }
 
     var account: Account? {
@@ -56,6 +64,29 @@ final class PhoneAppState: ObservableObject {
 
     var posts: [SocialPost] {
         database.posts.sorted { $0.createdAt > $1.createdAt }
+    }
+
+    var savedRoutes: [SavedRoute] { database.routes }
+
+    func replacePresetRunning(points: [GeoPoint]) {
+        mutate { database in
+            guard let index = database.routes.firstIndex(where: { $0.kind == .presetRunning }) else { return }
+            database.routes[index].points = points
+        }
+    }
+
+    func addGPXRoute(name: String, points: [GeoPoint]) -> String {
+        let identifier = UUID().uuidString
+        mutate { database in
+            var title = name
+            var suffix = 2
+            while database.routes.contains(where: { $0.name == title }) {
+                title = "\(name) \(suffix)"
+                suffix += 1
+            }
+            database.routes.append(SavedRoute(id: identifier, name: title, points: points, kind: .gpx))
+        }
+        return identifier
     }
 
     var metricOrder: [LiveBlock] {
@@ -263,8 +294,14 @@ final class WorkoutDraft: ObservableObject {
     @Published var countdown = false
     @Published var origin = MapOrigin.fallback
 
-    var planned: PlannedRoute {
-        SampleLibrary.plannedRoutes(around: origin).first { $0.id == routeID } ?? .free
+    func plannedRoute(saved: [SavedRoute], workouts: [WorkoutRecord]) -> PlannedRoute {
+        if let route = saved.first(where: { $0.id == routeID }) {
+            return PlannedRoute(id: route.id, name: route.name, points: route.points)
+        }
+        if let workout = workouts.first(where: { $0.id.uuidString == routeID }) {
+            return PlannedRoute(id: routeID, name: workout.sport.title, points: workout.route)
+        }
+        return .free
     }
 
     var members: [TeammateProfile] {

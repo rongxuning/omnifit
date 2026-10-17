@@ -20,7 +20,7 @@ struct LiveWorkoutView: View {
         .task {
             guard !started else { return }
             started = true
-            let live = app.session(for: draft.sport, route: draft.planned.points, teammates: draft.members)
+            let live = app.session(for: draft.sport, route: draft.plannedRoute(saved: app.savedRoutes, workouts: app.workouts).points, teammates: draft.members)
             session = live
             await live.start()
         }

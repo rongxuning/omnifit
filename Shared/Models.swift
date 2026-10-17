@@ -197,6 +197,22 @@ struct PlannedRoute: Identifiable, Hashable {
     static let free = PlannedRoute(id: "free", name: "自由", points: [])
 }
 
+/// A route kept on this device. There is no server.
+struct SavedRoute: Codable, Hashable, Identifiable {
+    var id: String
+    var name: String
+    var points: [GeoPoint]
+    var kind: Kind
+
+    enum Kind: String, Codable {
+        /// The one running route the phone editor can change.
+        case presetRunning
+        case gpx
+    }
+
+    static let presetRunningID = "preset-running"
+}
+
 struct TrainingStats {
     var distanceMeters: Double
     var averageHeartRate: Double
