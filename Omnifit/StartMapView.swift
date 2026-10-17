@@ -24,7 +24,8 @@ struct StartMapView: View {
             RouteMap(
                 route: [],
                 planned: draft.plannedRoute(saved: app.savedRoutes, workouts: app.workouts).points,
-                showsUser: true
+                showsUser: true,
+                userCoordinate: location.coordinate
             )
             .ignoresSafeArea()
 

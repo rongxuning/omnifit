@@ -6,9 +6,11 @@ struct RouteMap: View {
     var planned: [GeoPoint] = []
     var teammates: [TeammateLive] = []
     var showsUser: Bool = false
+    var userCoordinate: CLLocationCoordinate2D? = nil
     var cornerRadius: CGFloat = 0
 
     @State private var position: MapCameraPosition = .automatic
+    @State private var framedUser = false
 
     var body: some View {
         Map(position: $position, interactionModes: [.pan, .zoom]) {
@@ -39,13 +41,32 @@ struct RouteMap: View {
         }
         .mapStyle(.standard)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-        .onAppear(perform: frameCamera)
+        .onAppear {
+            frameCamera()
+            if userCoordinate != nil {
+                framedUser = true
+            }
+        }
         .onChange(of: route.count) { _, _ in frameCamera() }
+        .onChange(of: planned) { _, _ in frameCamera() }
+        .onChange(of: userCoordinate?.latitude) { _, _ in frameUserOnce() }
+        .onChange(of: userCoordinate?.longitude) { _, _ in frameUserOnce() }
+    }
+
+    /// The first user fix is part of the frame. Later fixes do not move the camera.
+    private func frameUserOnce() {
+        guard showsUser, userCoordinate != nil, !framedUser else { return }
+        framedUser = true
+        frameCamera()
     }
 
     private func frameCamera() {
-        let coords = route.map(\.coordinate) + planned.map(\.coordinate) + teammates.map(\.coordinate)
-        if showsUser, route.isEmpty, teammates.isEmpty {
+        var coords = route.map(\.coordinate) + planned.map(\.coordinate) + teammates.map(\.coordinate)
+        let hasLine = !route.isEmpty || !planned.isEmpty || !teammates.isEmpty
+        if showsUser, let userCoordinate, hasLine {
+            coords.append(userCoordinate)
+        }
+        if showsUser, !hasLine {
             position = .userLocation(fallback: .automatic)
             return
         }

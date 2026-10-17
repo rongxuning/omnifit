@@ -75,18 +75,24 @@ final class PhoneAppState: ObservableObject {
         }
     }
 
-    func addGPXRoute(name: String, points: [GeoPoint]) -> String {
-        let identifier = UUID().uuidString
+    func addGPXRoutes(_ imported: [(name: String, points: [GeoPoint])]) -> [String] {
+        var identifiers: [String] = []
         mutate { database in
-            var title = name
-            var suffix = 2
-            while database.routes.contains(where: { $0.name == title }) {
-                title = "\(name) \(suffix)"
-                suffix += 1
+            for item in imported where item.points.count >= 2 {
+                let identifier = UUID().uuidString
+                var title = item.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                if title.isEmpty { title = "导入路线" }
+                let base = title
+                var suffix = 2
+                while database.routes.contains(where: { $0.name == title }) {
+                    title = "\(base) \(suffix)"
+                    suffix += 1
+                }
+                database.routes.append(SavedRoute(id: identifier, name: title, points: item.points, kind: .gpx))
+                identifiers.append(identifier)
             }
-            database.routes.append(SavedRoute(id: identifier, name: title, points: points, kind: .gpx))
         }
-        return identifier
+        return identifiers
     }
 
     var metricOrder: [LiveBlock] {

@@ -71,6 +71,7 @@ struct MapLibraryView: View {
     @State private var showFilters = false
     @State private var importing = false
     @State private var importError: String?
+    @State private var focusIDs: [String] = []
 
     private var allLines: [ShownRoute] {
         let saved = app.savedRoutes.map { route in
@@ -152,6 +153,13 @@ struct MapLibraryView: View {
             fit(filtered)
         }
         .onChange(of: filtered.map(\.id)) { _, _ in
+            if !focusIDs.isEmpty {
+                let ids = focusIDs
+                focusIDs = []
+                let lines = filtered.filter { ids.contains($0.id) }
+                fit(lines.isEmpty ? filtered : lines)
+                return
+            }
             if area == .all {
                 fit(filtered)
             }
@@ -263,13 +271,41 @@ struct MapLibraryView: View {
         case .success(let url):
             let accessed = url.startAccessingSecurityScopedResource()
             defer { if accessed { url.stopAccessingSecurityScopedResource() } }
-            guard let data = try? Data(contentsOf: url), let parsed = GPXFile.parse(data) else {
+            guard let data = try? Data(contentsOf: url) else {
                 importError = "这个文件里没有路线点。"
                 return
             }
-            let kilometers = RouteMeasure.length(parsed.points) / 1000
-            if kilometers > maxKm { maxKm = kilometers }
-            draft.routeID = app.addGPXRoute(name: parsed.name, points: parsed.points)
+            let parsed = GPXFile.parse(data)
+            guard !parsed.isEmpty else {
+                importError = "这个文件里没有路线点。"
+                return
+            }
+            let kilometers = parsed.map { RouteMeasure.length($0.points) / 1000 }
+            if let shortest = kilometers.min(), shortest < minKm {
+                minKm = shortest
+            }
+            if let longest = kilometers.max(), longest > maxKm {
+                maxKm = longest
+            }
+            if area == .visible {
+                area = .all
+            }
+            let identifiers = app.addGPXRoutes(parsed)
+            guard let selected = identifiers.first else {
+                importError = "这个文件里没有路线点。"
+                return
+            }
+            draft.routeID = selected
+            focusIDs = identifiers
+            fit(parsed.map { line in
+                ShownRoute(
+                    id: selected,
+                    name: line.name,
+                    points: line.points,
+                    meters: RouteMeasure.length(line.points),
+                    fromWorkout: false
+                )
+            })
         }
     }
 }
@@ -477,18 +513,24 @@ enum GPXFile {
         return list
     }
 
-    static func parse(_ data: Data) -> (name: String, points: [GeoPoint])? {
+    static func parse(_ data: Data) -> [(name: String, points: [GeoPoint])] {
         let parser = GPXParser()
-        guard parser.parse(data), parser.points.count >= 2 else { return nil }
-        let trimmed = parser.routeName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return (trimmed.isEmpty ? "导入路线" : trimmed, parser.points)
+        guard parser.parse(data) else { return [] }
+        return parser.lines
     }
 }
 
 private final class GPXParser: NSObject, XMLParserDelegate {
-    var routeName: String?
-    var points: [GeoPoint] = []
-    private var inPoint = false
+    private(set) var lines: [(name: String, points: [GeoPoint])] = []
+    private var documentName: String?
+    private var trackDepth = 0
+    private var routeDepth = 0
+    private var waypointDepth = 0
+    private var trackPoints: [GeoPoint] = []
+    private var trackName: String?
+    private var routePoints: [GeoPoint] = []
+    private var routeName: String?
+    private var insidePoint = false
     private var readingName = false
     private var nameBuffer = ""
 
@@ -505,17 +547,39 @@ private final class GPXParser: NSObject, XMLParserDelegate {
         qualifiedName qName: String?,
         attributes attributeDict: [String: String] = [:]
     ) {
-        let name = elementName.lowercased()
-        if name == "trkpt" || name == "rtept" || name == "wpt" {
-            inPoint = true
-            if let latitude = Double(attributeDict["lat"] ?? ""),
-               let longitude = Double(attributeDict["lon"] ?? ""),
-               abs(latitude) <= 90, abs(longitude) <= 180 {
-                points.append(GeoPoint(latitude: latitude, longitude: longitude, altitude: 0, timestamp: nil))
+        switch localName(elementName, qualified: qName) {
+        case "trk":
+            trackDepth += 1
+            if trackDepth == 1 {
+                trackPoints = []
+                trackName = nil
             }
-        } else if name == "name", !inPoint, routeName == nil {
-            readingName = true
-            nameBuffer = ""
+        case "rte":
+            routeDepth += 1
+            if routeDepth == 1 {
+                routePoints = []
+                routeName = nil
+            }
+        case "wpt":
+            waypointDepth += 1
+            insidePoint = true
+        case "trkpt":
+            insidePoint = true
+            if trackDepth > 0, waypointDepth == 0 {
+                append(attributeDict, to: &trackPoints)
+            }
+        case "rtept":
+            insidePoint = true
+            if routeDepth > 0, trackDepth == 0, waypointDepth == 0 {
+                append(attributeDict, to: &routePoints)
+            }
+        case "name":
+            if !insidePoint {
+                readingName = true
+                nameBuffer = ""
+            }
+        default:
+            break
         }
     }
 
@@ -529,13 +593,61 @@ private final class GPXParser: NSObject, XMLParserDelegate {
         namespaceURI: String?,
         qualifiedName qName: String?
     ) {
-        let name = elementName.lowercased()
-        if name == "name", readingName {
-            routeName = nameBuffer
+        switch localName(elementName, qualified: qName) {
+        case "name":
+            guard readingName else { return }
+            let text = nameBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
             readingName = false
+            guard !text.isEmpty, waypointDepth == 0, !insidePoint else { return }
+            if trackDepth > 0, routeDepth == 0 {
+                if trackName == nil { trackName = text }
+            } else if routeDepth > 0, trackDepth == 0 {
+                if routeName == nil { routeName = text }
+            } else if documentName == nil {
+                documentName = text
+            }
+        case "trk":
+            if trackDepth == 1 {
+                commit(name: trackName, points: trackPoints)
+                trackPoints = []
+                trackName = nil
+            }
+            trackDepth = max(0, trackDepth - 1)
+        case "rte":
+            if routeDepth == 1 {
+                commit(name: routeName, points: routePoints)
+                routePoints = []
+                routeName = nil
+            }
+            routeDepth = max(0, routeDepth - 1)
+        case "wpt":
+            waypointDepth = max(0, waypointDepth - 1)
+            insidePoint = false
+        case "trkpt", "rtept":
+            insidePoint = false
+        default:
+            break
         }
-        if name == "trkpt" || name == "rtept" || name == "wpt" {
-            inPoint = false
-        }
+    }
+
+    private func append(_ attributes: [String: String], to points: inout [GeoPoint]) {
+        guard let latitude = Double(attributes["lat"] ?? ""),
+              let longitude = Double(attributes["lon"] ?? ""),
+              abs(latitude) <= 90, abs(longitude) <= 180 else { return }
+        points.append(GeoPoint(latitude: latitude, longitude: longitude, altitude: 0, timestamp: nil))
+    }
+
+    private func commit(name: String?, points: [GeoPoint]) {
+        guard points.count >= 2 else { return }
+        let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let fallback = documentName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let title = !trimmed.isEmpty ? trimmed : (fallback.isEmpty ? "导入路线" : fallback)
+        lines.append((name: title, points: points))
+    }
+
+    private func localName(_ elementName: String, qualified qName: String?) -> String {
+        let raw = (qName ?? elementName).lowercased()
+        guard let colon = raw.lastIndex(of: ":") else { return raw }
+        return String(raw[raw.index(after: colon)...])
     }
 }
