@@ -30,7 +30,7 @@ final class PhoneAppState: ObservableObject {
             if loaded.metricOrder.isEmpty {
                 loaded.metricOrder = LiveBlock.standard
             }
-            ensurePreset(&loaded)
+            Self.ensurePreset(&loaded)
             database = loaded
             AppFiles.save(loaded, name: filename)
         } else {
@@ -38,13 +38,13 @@ final class PhoneAppState: ObservableObject {
             fresh.workouts = SampleLibrary.workouts()
             fresh.posts = SampleLibrary.posts()
             fresh.seeded = true
-            ensurePreset(&fresh)
+            Self.ensurePreset(&fresh)
             database = fresh
             AppFiles.save(fresh, name: filename)
         }
     }
 
-    private func ensurePreset(_ database: inout Database) {
+    private static func ensurePreset(_ database: inout Database) {
         guard !database.routes.contains(where: { $0.kind == .presetRunning }) else { return }
         database.routes.insert(SampleLibrary.presetRunningRoute(), at: 0)
     }

@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>NSHealthShareUsageDescription</key>
-	<string>omnifit 读取徒步和跑步锻炼，以及运动中的心率。</string>
+	<string>sky-wanderer 读取徒步和跑步锻炼，以及运动中的心率。</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>omnifit 把徒步和跑步写入健康 App。</string>
+	<string>sky-wanderer 把徒步和跑步写入健康 App。</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>omnifit 在运动中记录路线。</string>
+	<string>sky-wanderer 在运动中记录路线。</string>
 	<key>NSMotionUsageDescription</key>
-	<string>omnifit 用步数估算运动中的步频。</string>
+	<string>sky-wanderer 用步数估算运动中的步频。</string>
 	<key>WKBackgroundModes</key>
 	<array>
 		<string>workout-processing</string>

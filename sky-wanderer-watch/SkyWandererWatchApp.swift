@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct OmnifitWatchApp: App {
+struct SkyWandererWatchApp: App {
     @StateObject private var app = WatchAppState()
 
     var body: some Scene {

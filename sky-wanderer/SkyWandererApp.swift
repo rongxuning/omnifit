@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct OmnifitApp: App {
+struct SkyWandererApp: App {
     @StateObject private var app = PhoneAppState()
     @StateObject private var draft = WorkoutDraft()
 

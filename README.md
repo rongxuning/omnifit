@@ -1,10 +1,10 @@
-# omnifit
+# sky-wanderer
 
-iPhone 和 Apple Watch 上的徒步、跑步应用。用 Xcode 16 或更新版本打开 `Omnifit.xcodeproj`。部署目标是 iOS 17 和 watchOS 10。
+iPhone 和 Apple Watch 上的徒步、跑步应用。用 Xcode 16 或更新版本打开 `sky-wanderer.xcodeproj`。部署目标是 iOS 26 和 watchOS 10。
 
 这台开发环境不能编译 Apple 平台，仓库里的工程没有在这里跑过构建。请在 Mac 上用 Xcode 编译 iPhone 和 Watch 两个 scheme。签名时选自己的开发团队。HealthKit 能力要在开发者账号里打开；仓库里的 entitlements 只是占位，没有密钥。
 
-Bundle ID：`com.rongxuning.omnifit`，手表是 `com.rongxuning.omnifit.watchkitapp`。
+Bundle ID：`com.rongxuning.sky-wanderer`，手表是 `com.rongxuning.sky-wanderer.watchkitapp`。
 
 ## 真实和模拟
 
