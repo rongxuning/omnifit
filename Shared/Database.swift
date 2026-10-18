@@ -50,7 +50,7 @@ enum AppFiles {
             appropriateFor: nil,
             create: true
         )
-        let folder = base.appendingPathComponent("omnifit", isDirectory: true)
+        let folder = base.appendingPathComponent("sky-wanderer", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         return folder
     }

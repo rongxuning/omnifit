@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A10000000000000000000002"
-               BuildableName = "Omnifit.app"
-               BlueprintName = "Omnifit"
-               ReferencedContainer = "container:Omnifit.xcodeproj">
+               BuildableName = "sky-wanderer.app"
+               BlueprintName = "sky-wanderer"
+               ReferencedContainer = "container:sky-wanderer.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -41,9 +41,9 @@
       <BuildableReference
          BuildableIdentifier = "primary"
          BlueprintIdentifier = "A10000000000000000000002"
-         BuildableName = "Omnifit.app"
-         BlueprintName = "Omnifit"
-         ReferencedContainer = "container:Omnifit.xcodeproj">
+         BuildableName = "sky-wanderer.app"
+         BlueprintName = "sky-wanderer"
+         ReferencedContainer = "container:sky-wanderer.xcodeproj">
       </BuildableReference>
    </LaunchAction>
    <ProfileAction
@@ -55,9 +55,9 @@
       <BuildableReference
          BuildableIdentifier = "primary"
          BlueprintIdentifier = "A10000000000000000000002"
-         BuildableName = "Omnifit.app"
-         BlueprintName = "Omnifit"
-         ReferencedContainer = "container:Omnifit.xcodeproj">
+         BuildableName = "sky-wanderer.app"
+         BlueprintName = "sky-wanderer"
+         ReferencedContainer = "container:sky-wanderer.xcodeproj">
       </BuildableReference>
    </ProfileAction>
    <AnalyzeAction

@@ -44,13 +44,13 @@ extension View {
     }
 }
 
-struct OmniWordmark: View {
+struct SkyWandererWordmark: View {
     var size: CGFloat = 36
 
     var body: some View {
         HStack(spacing: 0) {
-            Text("omni")
-            Text("fit").foregroundStyle(Color.omniCobalt)
+            Text("sky-")
+            Text("wanderer").foregroundStyle(Color.omniCobalt)
         }
         .font(.system(size: size, weight: .heavy, design: .rounded))
         .foregroundStyle(Color.omniInk)

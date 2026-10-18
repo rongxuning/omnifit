@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10000000000000000000014 /* OmnifitWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* OmnifitWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A10000000000000000000014 /* sky-wanderer-watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* sky-wanderer-watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -16,7 +16,7 @@
 			containerPortal = A10000000000000000000001 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A10000000000000000000003;
-			remoteInfo = OmnifitWatch;
+			remoteInfo = sky-wanderer-watch;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -27,7 +27,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				A10000000000000000000014 /* OmnifitWatch.app in Embed Watch Content */,
+				A10000000000000000000014 /* sky-wanderer-watch.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -35,52 +35,52 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A10000000000000000000004 /* Omnifit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Omnifit.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A10000000000000000000005 /* OmnifitWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OmnifitWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000004 /* sky-wanderer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sky-wanderer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000005 /* sky-wanderer-watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sky-wanderer-watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A1000000000000000000000B /* Exceptions for "Omnifit" folder in "Omnifit" target */ = {
+		A1000000000000000000000B /* Exceptions for "sky-wanderer" folder in "sky-wanderer" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Omnifit.entitlements,
+				sky-wanderer.entitlements,
 			);
-			target = A10000000000000000000002 /* Omnifit */;
+			target = A10000000000000000000002 /* sky-wanderer */;
 		};
-		A1000000000000000000000C /* Exceptions for "OmnifitWatch" folder in "OmnifitWatch" target */ = {
+		A1000000000000000000000C /* Exceptions for "sky-wanderer-watch" folder in "sky-wanderer-watch" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				OmnifitWatch.entitlements,
+				sky-wanderer-watch.entitlements,
 			);
-			target = A10000000000000000000003 /* OmnifitWatch */;
+			target = A10000000000000000000003 /* sky-wanderer-watch */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A10000000000000000000006 /* Omnifit */ = {
+		A10000000000000000000006 /* sky-wanderer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A1000000000000000000000B /* Exceptions for "Omnifit" folder in "Omnifit" target */,
+				A1000000000000000000000B /* Exceptions for "sky-wanderer" folder in "sky-wanderer" target */,
 			);
 			explicitFileTypes = {
 			};
 			explicitFolders = (
 			);
-			path = Omnifit;
+			path = sky-wanderer;
 			sourceTree = "<group>";
 		};
-		A10000000000000000000007 /* OmnifitWatch */ = {
+		A10000000000000000000007 /* sky-wanderer-watch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A1000000000000000000000C /* Exceptions for "OmnifitWatch" folder in "OmnifitWatch" target */,
+				A1000000000000000000000C /* Exceptions for "sky-wanderer-watch" folder in "sky-wanderer-watch" target */,
 			);
 			explicitFileTypes = {
 			};
 			explicitFolders = (
 			);
-			path = OmnifitWatch;
+			path = sky-wanderer-watch;
 			sourceTree = "<group>";
 		};
 		A10000000000000000000008 /* Shared */ = {
@@ -115,8 +115,8 @@
 		A10000000000000000000009 = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000006 /* Omnifit */,
-				A10000000000000000000007 /* OmnifitWatch */,
+				A10000000000000000000006 /* sky-wanderer */,
+				A10000000000000000000007 /* sky-wanderer-watch */,
 				A10000000000000000000008 /* Shared */,
 				A1000000000000000000000A /* Products */,
 			);
@@ -125,8 +125,8 @@
 		A1000000000000000000000A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000004 /* Omnifit.app */,
-				A10000000000000000000005 /* OmnifitWatch.app */,
+				A10000000000000000000004 /* sky-wanderer.app */,
+				A10000000000000000000005 /* sky-wanderer-watch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -134,9 +134,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A10000000000000000000002 /* Omnifit */ = {
+		A10000000000000000000002 /* sky-wanderer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000000000000000000018 /* Build configuration list for PBXNativeTarget "Omnifit" */;
+			buildConfigurationList = A10000000000000000000018 /* Build configuration list for PBXNativeTarget "sky-wanderer" */;
 			buildPhases = (
 				A1000000000000000000000D /* Sources */,
 				A1000000000000000000000E /* Frameworks */,
@@ -149,17 +149,17 @@
 				A10000000000000000000015 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A10000000000000000000006 /* Omnifit */,
+				A10000000000000000000006 /* sky-wanderer */,
 				A10000000000000000000008 /* Shared */,
 			);
-			name = Omnifit;
-			productName = Omnifit;
-			productReference = A10000000000000000000004 /* Omnifit.app */;
+			name = sky-wanderer;
+			productName = sky-wanderer;
+			productReference = A10000000000000000000004 /* sky-wanderer.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A10000000000000000000003 /* OmnifitWatch */ = {
+		A10000000000000000000003 /* sky-wanderer-watch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000000000000000000019 /* Build configuration list for PBXNativeTarget "OmnifitWatch" */;
+			buildConfigurationList = A10000000000000000000019 /* Build configuration list for PBXNativeTarget "sky-wanderer-watch" */;
 			buildPhases = (
 				A10000000000000000000011 /* Sources */,
 				A10000000000000000000012 /* Frameworks */,
@@ -170,12 +170,12 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A10000000000000000000007 /* OmnifitWatch */,
+				A10000000000000000000007 /* sky-wanderer-watch */,
 				A10000000000000000000008 /* Shared */,
 			);
-			name = OmnifitWatch;
-			productName = OmnifitWatch;
-			productReference = A10000000000000000000005 /* OmnifitWatch.app */;
+			name = sky-wanderer-watch;
+			productName = sky-wanderer-watch;
+			productReference = A10000000000000000000005 /* sky-wanderer-watch.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -196,7 +196,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A10000000000000000000017 /* Build configuration list for PBXProject "Omnifit" */;
+			buildConfigurationList = A10000000000000000000017 /* Build configuration list for PBXProject "sky-wanderer" */;
 			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
@@ -210,8 +210,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A10000000000000000000002 /* Omnifit */,
-				A10000000000000000000003 /* OmnifitWatch */,
+				A10000000000000000000002 /* sky-wanderer */,
+				A10000000000000000000003 /* sky-wanderer-watch */,
 			);
 		};
 /* End PBXProject section */
@@ -253,7 +253,7 @@
 /* Begin PBXTargetDependency section */
 		A10000000000000000000015 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A10000000000000000000003 /* OmnifitWatch */;
+			target = A10000000000000000000003 /* sky-wanderer-watch */;
 			targetProxy = A10000000000000000000016 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -297,23 +297,24 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Omnifit/Omnifit.entitlements;
+				CODE_SIGN_ENTITLEMENTS = sky-wanderer/sky-wanderer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Omnifit/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = omnifit;
+				INFOPLIST_FILE = sky-wanderer/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = sky-wanderer;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.omnifit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.sky-wanderer;
+				PRODUCT_MODULE_NAME = SkyWanderer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -329,23 +330,24 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Omnifit/Omnifit.entitlements;
+				CODE_SIGN_ENTITLEMENTS = sky-wanderer/sky-wanderer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Omnifit/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = omnifit;
+				INFOPLIST_FILE = sky-wanderer/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = sky-wanderer;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.omnifit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.sky-wanderer;
+				PRODUCT_MODULE_NAME = SkyWanderer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -361,20 +363,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = OmnifitWatch/OmnifitWatch.entitlements;
+				CODE_SIGN_ENTITLEMENTS = sky-wanderer-watch/sky-wanderer-watch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = OmnifitWatch/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = omnifit;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.rongxuning.omnifit;
+				INFOPLIST_FILE = sky-wanderer-watch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = sky-wanderer;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.rongxuning.sky-wanderer;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.omnifit.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.sky-wanderer.watchkitapp;
+				PRODUCT_MODULE_NAME = SkyWandererWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -392,20 +395,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = OmnifitWatch/OmnifitWatch.entitlements;
+				CODE_SIGN_ENTITLEMENTS = sky-wanderer-watch/sky-wanderer-watch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = OmnifitWatch/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = omnifit;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.rongxuning.omnifit;
+				INFOPLIST_FILE = sky-wanderer-watch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = sky-wanderer;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.rongxuning.sky-wanderer;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.omnifit.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.sky-wanderer.watchkitapp;
+				PRODUCT_MODULE_NAME = SkyWandererWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -421,7 +425,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A10000000000000000000017 /* Build configuration list for PBXProject "Omnifit" */ = {
+		A10000000000000000000017 /* Build configuration list for PBXProject "sky-wanderer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A1000000000000000000001A /* Debug */,
@@ -430,7 +434,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A10000000000000000000018 /* Build configuration list for PBXNativeTarget "Omnifit" */ = {
+		A10000000000000000000018 /* Build configuration list for PBXNativeTarget "sky-wanderer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A1000000000000000000001C /* Debug */,
@@ -439,7 +443,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A10000000000000000000019 /* Build configuration list for PBXNativeTarget "OmnifitWatch" */ = {
+		A10000000000000000000019 /* Build configuration list for PBXNativeTarget "sky-wanderer-watch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A1000000000000000000001E /* Debug */,

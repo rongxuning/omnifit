@@ -19,7 +19,7 @@ struct AuthFlow: View {
                     case .forgot:
                         ForgotPasswordView(path: $path)
                     case .reset(let email):
-                        ResetPasswordView(email: email, path: $path)
+                        ResetPasswordView(path: $path, email: email)
                     }
                 }
         }
@@ -39,7 +39,7 @@ struct LoginView: View {
             VStack {
                 Spacer()
                 VStack(spacing: 0) {
-                    OmniWordmark()
+                    SkyWandererWordmark()
                     Text("徒步与跑步")
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.omniMuted)
