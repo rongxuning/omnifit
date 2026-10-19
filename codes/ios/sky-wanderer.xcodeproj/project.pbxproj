@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,7 +16,7 @@
 			containerPortal = A10000000000000000000001 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A10000000000000000000003;
-			remoteInfo = sky-wanderer-watch;
+			remoteInfo = "sky-wanderer-watch";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -35,63 +35,31 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A10000000000000000000004 /* sky-wanderer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sky-wanderer.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A10000000000000000000005 /* sky-wanderer-watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sky-wanderer-watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000004 /* sky-wanderer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "sky-wanderer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000005 /* sky-wanderer-watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "sky-wanderer-watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A1000000000000000000000B /* Exceptions for "sky-wanderer" folder in "sky-wanderer" target */ = {
+		A1000000000000000000000B /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				sky-wanderer.entitlements,
 			);
 			target = A10000000000000000000002 /* sky-wanderer */;
 		};
-		A1000000000000000000000C /* Exceptions for "sky-wanderer-watch" folder in "sky-wanderer-watch" target */ = {
+		A1000000000000000000000C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				sky-wanderer-watch.entitlements,
 			);
 			target = A10000000000000000000003 /* sky-wanderer-watch */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A10000000000000000000006 /* sky-wanderer */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A1000000000000000000000B /* Exceptions for "sky-wanderer" folder in "sky-wanderer" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = sky-wanderer;
-			sourceTree = "<group>";
-		};
-		A10000000000000000000007 /* sky-wanderer-watch */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A1000000000000000000000C /* Exceptions for "sky-wanderer-watch" folder in "sky-wanderer-watch" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = sky-wanderer-watch;
-			sourceTree = "<group>";
-		};
-		A10000000000000000000008 /* Shared */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
+		A10000000000000000000006 /* sky-wanderer */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A1000000000000000000000B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "sky-wanderer"; sourceTree = "<group>"; };
+		A10000000000000000000007 /* sky-wanderer-watch */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A1000000000000000000000C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "sky-wanderer-watch"; sourceTree = "<group>"; };
+		A10000000000000000000008 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,8 +120,8 @@
 				A10000000000000000000006 /* sky-wanderer */,
 				A10000000000000000000008 /* Shared */,
 			);
-			name = sky-wanderer;
-			productName = sky-wanderer;
+			name = "sky-wanderer";
+			productName = "sky-wanderer";
 			productReference = A10000000000000000000004 /* sky-wanderer.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -173,8 +141,8 @@
 				A10000000000000000000007 /* sky-wanderer-watch */,
 				A10000000000000000000008 /* Shared */,
 			);
-			name = sky-wanderer-watch;
-			productName = sky-wanderer-watch;
+			name = "sky-wanderer-watch";
+			productName = "sky-wanderer-watch";
 			productReference = A10000000000000000000005 /* sky-wanderer-watch.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -297,13 +265,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = sky-wanderer/sky-wanderer.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "sky-wanderer/sky-wanderer.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QTV9DUCAY7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = sky-wanderer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = sky-wanderer;
+				INFOPLIST_FILE = "sky-wanderer/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "sky-wanderer";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -313,7 +282,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.sky-wanderer;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rongxuning.sky-wanderer";
 				PRODUCT_MODULE_NAME = SkyWanderer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -330,13 +299,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = sky-wanderer/sky-wanderer.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "sky-wanderer/sky-wanderer.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QTV9DUCAY7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = sky-wanderer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = sky-wanderer;
+				INFOPLIST_FILE = "sky-wanderer/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "sky-wanderer";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -346,7 +316,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.sky-wanderer;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rongxuning.sky-wanderer";
 				PRODUCT_MODULE_NAME = SkyWanderer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -363,20 +333,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = sky-wanderer-watch/sky-wanderer-watch.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "sky-wanderer-watch/sky-wanderer-watch.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QTV9DUCAY7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = sky-wanderer-watch/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = sky-wanderer;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.rongxuning.sky-wanderer;
+				INFOPLIST_FILE = "sky-wanderer-watch/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "sky-wanderer";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.rongxuning.sky-wanderer";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.sky-wanderer.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rongxuning.sky-wanderer.watchkitapp";
 				PRODUCT_MODULE_NAME = SkyWandererWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -395,20 +366,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = sky-wanderer-watch/sky-wanderer-watch.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "sky-wanderer-watch/sky-wanderer-watch.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QTV9DUCAY7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = sky-wanderer-watch/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = sky-wanderer;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.rongxuning.sky-wanderer;
+				INFOPLIST_FILE = "sky-wanderer-watch/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "sky-wanderer";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.rongxuning.sky-wanderer";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rongxuning.sky-wanderer.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rongxuning.sky-wanderer.watchkitapp";
 				PRODUCT_MODULE_NAME = SkyWandererWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;

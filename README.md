@@ -1,6 +1,14 @@
 # sky-wanderer
 
-iPhone 和 Apple Watch 上的徒步、跑步应用。用 Xcode 16 或更新版本打开 `sky-wanderer.xcodeproj`。部署目标是 iOS 26 和 watchOS 10。
+iPhone 和 Apple Watch 上的徒步、跑步应用。用 Xcode 16 或更新版本打开 `codes/ios/sky-wanderer.xcodeproj`。部署目标是 iOS 26 和 watchOS 10。
+
+## 目录
+
+- `codes/ios`：iPhone、Apple Watch 和共用代码
+- `codes/web`：Web 端
+- `codes/server`：服务端
+- `deploy`：发布流程和脚本
+- `docs/planning`、`docs/proposals`、`docs/design`：规划、方案、设计
 
 这台开发环境不能编译 Apple 平台，仓库里的工程没有在这里跑过构建。请在 Mac 上用 Xcode 编译 iPhone 和 Watch 两个 scheme。签名时选自己的开发团队。HealthKit 能力要在开发者账号里打开；仓库里的 entitlements 只是占位，没有密钥。
 
