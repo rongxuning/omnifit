@@ -10,9 +10,5 @@
 	<string>sky-wanderer 在开始和进行运动时显示当前位置和路线。</string>
 	<key>NSMotionUsageDescription</key>
 	<string>sky-wanderer 用步数估算运动中的步频。</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>workout-processing</string>
-	</array>
 </dict>
 </plist>
