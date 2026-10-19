@@ -1,6 +1,12 @@
 # macOS
 .DS_Store
 
+# Signing material and local upload artifacts. Never commit these.
+*.p8
+*.p12
+*.mobileprovision
+private_keys/
+
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore

@@ -14,6 +14,8 @@ iPhone 和 Apple Watch 上的徒步、跑步应用。用 Xcode 16 或更新版�
 
 Bundle ID：`com.rongxuning.sky-wanderer`，手表是 `com.rongxuning.sky-wanderer.watchkitapp`。
 
+推到 `main` 且改动 `codes/ios/**` 时，GitHub Actions 会归档并上传 TestFlight。第一次成功运行前，需要仓库管理员按 [docs/ci-testflight.md](docs/ci-testflight.md) 配好签名和 App Store Connect 的 secrets。工作流不会把构建号提交回仓库。
+
 ## 真实和模拟
 
 真实路径：HealthKit 授权后读取心率、睡眠、步数，并记录徒步和跑步；地图用 MapKit 和系统定位；账号存在本机。
