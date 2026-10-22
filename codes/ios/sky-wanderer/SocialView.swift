@@ -8,8 +8,6 @@ struct SocialFeedView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                Text("社交")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
                 Text("运动结束后可以选择分享到这里。示例和你自己的分享都在这台手机上。")
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color.omniMuted)

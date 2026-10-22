@@ -7,9 +7,6 @@ struct MeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Text("个人设置")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-
                 sectionTitle("账号")
                 HStack {
                     Text(app.account?.name ?? "")

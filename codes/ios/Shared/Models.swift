@@ -133,6 +133,40 @@ struct WorkoutRecord: Codable, Hashable, Identifiable {
     var sessionLoad: Int {
         TrainingEstimate.sessionLoad(duration: duration, averageHeartRate: averageHeartRate, sport: sport)
     }
+
+    /// Meters per step.
+    /// Uses a time-weighted mean of `stride` when that series has samples.
+    /// Otherwise derives stride from speed and cadence: (1000 / pace) / (cadence / 60).
+    /// Returns 0 when neither source exists, or the result is outside 0.30–2.20 m
+    /// (HealthKit imports often store an empty stride series and cadence 0).
+    var averageStrideMeters: Double {
+        let samples = stride.filter { $0.value > 0 }.sorted { $0.second < $1.second }
+        let measured: Double
+        if samples.count >= 2 {
+            var area = 0.0
+            var span = 0.0
+            for index in 1..<samples.count {
+                let dt = samples[index].second - samples[index - 1].second
+                guard dt > 0 else { continue }
+                area += (samples[index].value + samples[index - 1].value) / 2 * dt
+                span += dt
+            }
+            if span > 0 {
+                measured = area / span
+            } else {
+                measured = samples.reduce(0) { $0 + $1.value } / Double(samples.count)
+            }
+        } else if let only = samples.first {
+            measured = only.value
+        } else {
+            let pace = averagePaceSecPerKm
+            guard averageCadence > 30, pace > 0, pace < 3_600 else { return 0 }
+            let metersPerSecond = 1000 / pace
+            measured = metersPerSecond / (averageCadence / 60)
+        }
+        guard measured >= 0.30, measured <= 2.20 else { return 0 }
+        return measured
+    }
 }
 
 struct Account: Codable, Hashable, Identifiable {
@@ -219,8 +253,23 @@ struct TrainingStats {
     var elevationGainMeters: Double
     var averageCadence: Double
     var count: Int
+    /// Seconds per kilometer across the window. 0 when distance is missing.
+    var averagePaceSecPerKm: Double
+    /// Meters per step. 0 when stride cannot be measured or derived.
+    var averageStrideMeters: Double
+    /// Arithmetic mean of per-session load, including sessions whose load is 0.
+    var averageSessionLoad: Double
 
-    static let empty = TrainingStats(distanceMeters: 0, averageHeartRate: 0, elevationGainMeters: 0, averageCadence: 0, count: 0)
+    static let empty = TrainingStats(
+        distanceMeters: 0,
+        averageHeartRate: 0,
+        elevationGainMeters: 0,
+        averageCadence: 0,
+        count: 0,
+        averagePaceSecPerKm: 0,
+        averageStrideMeters: 0,
+        averageSessionLoad: 0
+    )
 }
 
 enum StatsWindow: String, CaseIterable, Identifiable {
