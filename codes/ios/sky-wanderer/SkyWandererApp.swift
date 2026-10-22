@@ -35,9 +35,9 @@ enum MapRoute: Hashable {
 }
 
 enum RootTab: String, CaseIterable, Identifiable {
-    case train
-    case map
     case records
+    case map
+    case train
     case social
     case me
 
@@ -45,9 +45,9 @@ enum RootTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .train: return "训练"
-        case .map: return "地图"
         case .records: return "记录"
+        case .map: return "地图"
+        case .train: return "Go"
         case .social: return "社交"
         case .me: return "我"
         }
@@ -81,7 +81,7 @@ struct RootView: View {
 
 struct MainShell: View {
     @EnvironmentObject private var app: PhoneAppState
-    @State private var tab: RootTab = .train
+    @State private var tab: RootTab = .records
     @State private var trainPath = NavigationPath()
     @State private var mapPath = NavigationPath()
     @State private var recordPath = NavigationPath()
@@ -89,9 +89,9 @@ struct MainShell: View {
 
     private var showsTabBar: Bool {
         switch tab {
-        case .train: return trainPath.isEmpty
-        case .map: return mapPath.isEmpty
         case .records: return recordPath.isEmpty
+        case .map: return mapPath.isEmpty
+        case .train: return trainPath.isEmpty
         case .social: return true
         case .me: return mePath.isEmpty
         }
@@ -101,15 +101,12 @@ struct MainShell: View {
         ZStack(alignment: .bottom) {
             Group {
                 switch tab {
-                case .train:
-                    NavigationStack(path: $trainPath) {
-                        TrainHome()
-                            .navigationDestination(for: TrainRoute.self) { route in
-                                switch route {
-                                case .start: StartMapView(path: $trainPath, tab: $tab)
-                                case .team: TeamPickerView()
-                                case .live: LiveWorkoutView()
-                                case .layout: LayoutEditor()
+                case .records:
+                    NavigationStack(path: $recordPath) {
+                        RecordsView()
+                            .navigationDestination(for: RecordRoute.self) { route in
+                                if case .detail(let id) = route {
+                                    WorkoutDetailView(workoutID: id)
                                 }
                             }
                     }
@@ -120,12 +117,15 @@ struct MainShell: View {
                                 PresetRouteEditor()
                             }
                     }
-                case .records:
-                    NavigationStack(path: $recordPath) {
-                        RecordsView()
-                            .navigationDestination(for: RecordRoute.self) { route in
-                                if case .detail(let id) = route {
-                                    WorkoutDetailView(workoutID: id)
+                case .train:
+                    NavigationStack(path: $trainPath) {
+                        TrainHome()
+                            .navigationDestination(for: TrainRoute.self) { route in
+                                switch route {
+                                case .start: StartMapView(path: $trainPath, tab: $tab)
+                                case .team: TeamPickerView()
+                                case .live: LiveWorkoutView()
+                                case .layout: LayoutEditor()
                                 }
                             }
                     }
@@ -147,7 +147,7 @@ struct MainShell: View {
             if showsTabBar {
                 FloatingTabBar(tab: $tab)
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
+                    .padding(.bottom, 20)
             }
         }
         .onChange(of: app.finishedToken) { _, _ in
@@ -184,6 +184,10 @@ struct FloatingTabBar: View {
         .padding(.horizontal, 6)
         .frame(height: 64)
         .glass(radius: 32)
+        .overlay(
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
+                .stroke(Color.black, lineWidth: 2)
+        )
     }
 }
 
@@ -193,8 +197,6 @@ struct TrainHome: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Text("训练")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
                 Text("徒步与跑步")
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color.omniMuted)

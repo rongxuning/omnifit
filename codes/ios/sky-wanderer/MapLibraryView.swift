@@ -183,23 +183,22 @@ struct MapLibraryView: View {
     }
 
     private var topBar: some View {
-        HStack(spacing: 8) {
-            Text("地图")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundStyle(Color.omniInk)
-            Spacer(minLength: 4)
-            barLink("筛选") { showFilters = true }
-            barLink("导入") { importing = true }
-            NavigationLink(value: MapRoute.editor) {
-                Text("编辑")
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.omniCobalt)
+        HStack {
+            Spacer(minLength: 0)
+            HStack(spacing: 8) {
+                barLink("筛选") { showFilters = true }
+                barLink("导入") { importing = true }
+                NavigationLink(value: MapRoute.editor) {
+                    Text("编辑")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color.omniCobalt)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .glass(radius: 22)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .glass(radius: 22)
     }
 
     private func barLink(_ title: String, action: @escaping () -> Void) -> some View {

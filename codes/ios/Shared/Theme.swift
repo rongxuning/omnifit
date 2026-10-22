@@ -4,6 +4,8 @@ extension Color {
     static let omniCanvas = Color(red: 248 / 255, green: 250 / 255, blue: 252 / 255)
     static let omniIce = Color(red: 125 / 255, green: 211 / 255, blue: 252 / 255)
     static let omniCobalt = Color(red: 2 / 255, green: 132 / 255, blue: 199 / 255)
+    /// Deeper blue for the records stats module. Darker than `omniCobalt` so white type stays readable.
+    static let omniDeep = Color(red: 2 / 255, green: 72 / 255, blue: 128 / 255)
     static let omniInk = Color(red: 15 / 255, green: 23 / 255, blue: 42 / 255)
     static let omniCoral = Color(red: 1, green: 107 / 255, blue: 107 / 255)
     static let omniMuted = Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255)

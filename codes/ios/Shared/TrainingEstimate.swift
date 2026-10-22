@@ -46,6 +46,10 @@ enum TrainingEstimate {
 }
 
 enum RecordStats {
+    /// 平均配速 = 有距离记录的总时长 / 总公里，不是各次配速的算术平均。
+    /// 平均步幅 = 各次 `averageStrideMeters` 的时长加权平均；单次没有步幅序列时，用速度和步频推算。
+    /// 健康导入经常没有步幅和步频，这时平均步幅为 0，界面显示「—」。
+    /// 平均负荷 = 窗口内各次负荷的算术平均，包含负荷为 0 的记录。
     static func make(workouts: [WorkoutRecord], window: StatsWindow, now: Date = Date()) -> TrainingStats {
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = Locale(identifier: "zh_CN")
@@ -67,12 +71,25 @@ enum RecordStats {
         let cadenceDuration = cadencePool.reduce(0) { $0 + $1.duration }
         let heart = heartDuration > 0 ? heartPool.reduce(0) { $0 + $1.averageHeartRate * $1.duration } / heartDuration : 0
         let cadence = cadenceDuration > 0 ? cadencePool.reduce(0) { $0 + $1.averageCadence * $1.duration } / cadenceDuration : 0
+        let moving = matched.filter { $0.distanceMeters > 1 && $0.duration > 0 }
+        let movingDistance = moving.reduce(0) { $0 + $1.distanceMeters }
+        let movingDuration = moving.reduce(0) { $0 + $1.duration }
+        let pace = movingDistance > 1 ? movingDuration / (movingDistance / 1000) : 0
+        let stridePool = matched.filter { $0.averageStrideMeters > 0 && $0.duration > 0 }
+        let strideDuration = stridePool.reduce(0) { $0 + $1.duration }
+        let stride = strideDuration > 0
+            ? stridePool.reduce(0) { $0 + $1.averageStrideMeters * $1.duration } / strideDuration
+            : 0
+        let load = Double(matched.reduce(0) { $0 + $1.sessionLoad }) / Double(matched.count)
         return TrainingStats(
             distanceMeters: matched.reduce(0) { $0 + $1.distanceMeters },
             averageHeartRate: heart,
             elevationGainMeters: matched.reduce(0) { $0 + $1.elevationGainMeters },
             averageCadence: cadence,
-            count: matched.count
+            count: matched.count,
+            averagePaceSecPerKm: pace,
+            averageStrideMeters: stride,
+            averageSessionLoad: load
         )
     }
 }
